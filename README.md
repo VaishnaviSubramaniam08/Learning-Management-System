@@ -1,70 +1,220 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# LMS Course & Module Management System
 
-## Available Scripts
+A comprehensive Learning Management System (LMS) with course and module management capabilities, built with React frontend, Express backend, and MongoDB database.
 
-In the project directory, you can run:
+## 🚀 Features
 
-### `npm start`
+### For Instructors:
+- ✅ **Course Creation**: Create courses with title, description, category, level, duration, and price
+- ✅ **Module Management**: Add multiple modules per course with title, content, video URLs, and order
+- ✅ **Module Reordering**: Drag and drop or manual reordering of modules
+- ✅ **Course Editing**: Update course details and module information
+- ✅ **Course Deletion**: Remove courses and associated modules
+- ✅ **Progress Tracking**: View student progress and completion status
+- ✅ **Assessment Management**: Create quizzes and grade student submissions
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### For Students:
+- ✅ **Course Enrollment**: Browse and enroll in available courses
+- ✅ **Module Viewing**: View modules in correct order with progress tracking
+- ✅ **Content Consumption**: Watch videos, read content, and access resources
+- ✅ **Progress Tracking**: See completion status for each module and course
+- ✅ **Assessment Taking**: Take quizzes and view results
+- ✅ **Certificate Generation**: Earn certificates upon course completion
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🏗️ Architecture
 
-### `npm test`
+### Backend (Node.js + Express + MongoDB)
+```
+backend/
+├── models/
+│   ├── Course.js          # Course schema with module references
+│   ├── Module.js          # Module schema with course relationship
+│   └── User.js            # User authentication
+├── routes/
+│   └── courses.js         # Complete CRUD API for courses & modules
+├── middleware/
+│   ├── auth.js            # JWT authentication
+│   └── instructorAuth.js  # Role-based authorization
+└── server.js              # Express server setup
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend (React)
+```
+frontend/src/components/
+├── CourseManagement.js    # Instructor course management interface
+├── EnrolledCourses.js     # Student course viewing interface
+├── StudentDashboard.js    # Student dashboard with course integration
+├── InstructorDashboard.js # Instructor dashboard with course management
+└── AssessmentTab.js       # Quiz and assessment components
+```
 
-### `npm run build`
+## 📊 Database Schema
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Course Model
+```javascript
+{
+  title: String,           // Course title
+  description: String,     // Course description
+  category: String,        // Course category
+  level: String,           // beginner/intermediate/advanced
+  duration: Number,        // Total hours
+  price: Number,           // Course price
+  instructor: ObjectId,    // Reference to User
+  modules: [ObjectId],     // Array of Module references
+  isPublished: Boolean,    // Publication status
+  enrollmentCount: Number, // Number of enrolled students
+  rating: Number,          // Average rating
+  totalRatings: Number     // Total number of ratings
+}
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Module Model
+```javascript
+{
+  title: String,           // Module title
+  description: String,     // Module description
+  content: String,         // Module content/text
+  order: Number,           // Display order (auto-incremented)
+  course: ObjectId,        // Reference to Course
+  videoUrl: String,        // Optional video URL
+  documentUrl: String,     // Optional document URL
+  duration: Number,        // Module duration in minutes
+  isPublished: Boolean,    // Publication status
+  quiz: ObjectId,          // Reference to Quiz (optional)
+  resources: [{            // Additional resources
+    title: String,
+    url: String,
+    type: String
+  }],
+  learningObjectives: [String], // Learning objectives
+  prerequisites: [ObjectId]     // Prerequisite modules
+}
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🔌 API Endpoints
 
-### `npm run eject`
+### Course Management
+```
+GET    /courses                    # Get all courses (with filters)
+GET    /courses/:id               # Get course by ID with modules
+POST   /courses                   # Create new course (instructor only)
+PUT    /courses/:id               # Update course (instructor only)
+DELETE /courses/:id               # Delete course (instructor only)
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Module Management
+```
+GET    /courses/:courseId/modules           # Get modules for course
+POST   /courses/:courseId/modules           # Add module to course
+PUT    /courses/:courseId/modules/:moduleId # Update module
+DELETE /courses/:courseId/modules/:moduleId # Delete module
+PUT    /courses/:courseId/modules/reorder   # Reorder modules
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Student Management
+```
+GET    /courses/student/:studentId/enrollments # Get student enrollments
+POST   /courses/:id/enroll                    # Enroll student in course
+PUT    /courses/:courseId/progress            # Update module progress
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🎯 Key Features Implementation
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1. Course Creation with Modules
+- Instructors can create courses with basic information
+- Modules are created automatically when course is saved
+- Proper order assignment and validation
 
-## Learn More
+### 2. Module Management
+- **Order Management**: Auto-incrementing order with unique constraints
+- **Content Types**: Support for text, video, documents, and resources
+- **Prerequisites**: Module dependency system
+- **Learning Objectives**: Structured learning goals
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 3. Student Experience
+- **Progressive Learning**: Modules unlock based on completion
+- **Progress Tracking**: Real-time progress updates
+- **Content Consumption**: Video player, document viewer, and text content
+- **Assessment Integration**: Quiz taking and result viewing
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 4. Database Relationships
+- **One-to-Many**: Course → Modules
+- **Many-to-One**: Modules → Course
+- **Referential Integrity**: Proper foreign key relationships
+- **Population**: Efficient data loading with populate()
 
-### Code Splitting
+## 🛠️ Setup Instructions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Backend Setup
+```bash
+cd backend
+npm install
+npm start
+```
 
-### Analyzing the Bundle Size
+### Frontend Setup
+```bash
+cd frontend
+npm install
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Environment Variables
+```env
+MONGODB_URI=mongodb://localhost:27017/lms
+JWT_SECRET=your-secret-key
+PORT=5000
+```
 
-### Making a Progressive Web App
+## 🔒 Security Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- **JWT Authentication**: Secure token-based authentication
+- **Role-Based Access**: Instructor and student role separation
+- **Input Validation**: Comprehensive form validation
+- **Error Handling**: Proper error responses and logging
+- **Data Sanitization**: XSS and injection protection
 
-### Advanced Configuration
+## 📱 User Interface
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Instructor Dashboard
+- Clean, modern interface with purple accent colors
+- Modal-based forms for course and module creation
+- Drag-and-drop module reordering
+- Real-time progress tracking
+- Assessment management tools
 
-### Deployment
+### Student Dashboard
+- Card-based course display
+- Progress bars and completion indicators
+- Module unlocking system
+- Video player integration
+- Certificate generation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🚀 Future Enhancements
 
-### `npm run build` fails to minify
+- [ ] **Real-time Collaboration**: Live chat and discussion forums
+- [ ] **Advanced Analytics**: Detailed learning analytics and insights
+- [ ] **Mobile App**: React Native mobile application
+- [ ] **AI Integration**: Smart content recommendations
+- [ ] **Gamification**: Points, badges, and leaderboards
+- [ ] **Multi-language Support**: Internationalization
+- [ ] **Offline Support**: Service worker for offline access
+- [ ] **Advanced Assessment**: Multiple question types and auto-grading
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions, please open an issue in the GitHub repository or contact the development team. 
+>>>>>>> 2bb01968afe4321132296edcc90f50f1824245ea
